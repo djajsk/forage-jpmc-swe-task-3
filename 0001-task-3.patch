@@ -1,0 +1,94 @@
+From f9e97cc680e099dbff0e9ea2f7abc31f2b279027 Mon Sep 17 00:00:00 2001
+From: Dhruvil Jain <92313597+djajsk@users.noreply.github.com>
+Date: Fri, 1 Sep 2023 17:53:43 +0530
+Subject: [PATCH] task-3
+
+---
+ src/DataStreamer.ts | 10 ++++++++--
+ src/Graph.tsx       | 29 +++++++++++++++++++++--------
+ 2 files changed, 29 insertions(+), 10 deletions(-)
+
+diff --git a/src/DataStreamer.ts b/src/DataStreamer.ts
+index 9d9eca7..d807dc3 100644
+--- a/src/DataStreamer.ts
++++ b/src/DataStreamer.ts
+@@ -4,9 +4,15 @@ export interface Order {
+ }
+ export interface ServerRespond {
+   stock: string,
+-  top_bid: Order,
+-  top_ask: Order,
++  price_abc: number,
++  price_def: number,
++  ratio: number,
+   timestamp: Date,
++  upper_bound: number,
++  lower_bound: number,
++  trigger_alert: number | undefined,
++  // Add the order property
++  
+ }
+ 
+ class DataStreamer {
+diff --git a/src/Graph.tsx b/src/Graph.tsx
+index 277797d..2c2b86c 100644
+--- a/src/Graph.tsx
++++ b/src/Graph.tsx
+@@ -23,10 +23,15 @@ class Graph extends Component<IProps, {}> {
+     const elem = document.getElementsByTagName('perspective-viewer')[0] as unknown as PerspectiveViewerElement;
+ 
+     const schema = {
+-      stock: 'string',
+-      top_ask_price: 'float',
+-      top_bid_price: 'float',
++      price_abc: 'float',
++      price_def: 'float',
++      ratio: 'float',
+       timestamp: 'date',
++      upper_bound: 'float',
++      lower_bound: 'float',
++      trigger_alert: 'float',
++
++      stock: 'string',
+     };
+ 
+     if (window.perspective && window.perspective.worker()) {
+@@ -37,22 +42,30 @@ class Graph extends Component<IProps, {}> {
+       elem.load(this.table);
+       elem.setAttribute('view', 'y_line');
+       elem.setAttribute('column-pivots', '["stock"]');
++
+       elem.setAttribute('row-pivots', '["timestamp"]');
+-      elem.setAttribute('columns', '["top_ask_price"]');
++      elem.setAttribute('columns', '["ratio", "lower_bound", "upper_bound", "trigger_alert"]');
++      
+       elem.setAttribute('aggregates', JSON.stringify({
+         stock: 'distinctcount',
+-        top_ask_price: 'avg',
+-        top_bid_price: 'avg',
++        price_abc: 'avg',
++        price_def: 'avg',
++        ratio: 'avg',
+         timestamp: 'distinct count',
++        upper_bound: 'avg',
++        lower_bound: 'avg',
++        trigger_alert: 'avg',
+       }));
+     }
+   }
+ 
+   componentDidUpdate() {
++    
++
+     if (this.table) {
+-      this.table.update(
++      this.table.update([
+         DataManipulator.generateRow(this.props.data),
+-      );
++      ]);
+     }
+   }
+ }
+-- 
+2.41.0.windows.3
+
