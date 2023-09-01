@@ -4,9 +4,15 @@ export interface Order {
 }
 export interface ServerRespond {
   stock: string,
-  top_bid: Order,
-  top_ask: Order,
+  price_abc: number,
+  price_def: number,
+  ratio: number,
   timestamp: Date,
+  upper_bound: number,
+  lower_bound: number,
+  trigger_alert: number | undefined,
+  // Add the order property
+  
 }
 
 class DataStreamer {
